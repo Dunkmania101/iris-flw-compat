@@ -1,35 +1,39 @@
 package top.leonx.irisflw.compiler;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import com.jozufozu.flywheel.backend.gl.shader.GlProgram;
 import com.jozufozu.flywheel.core.compile.ProgramContext;
 import com.jozufozu.flywheel.core.compile.Template;
 import com.jozufozu.flywheel.core.compile.VertexData;
 import com.jozufozu.flywheel.core.shader.WorldProgram;
 import com.jozufozu.flywheel.core.source.FileResolution;
+
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.blending.AlphaTest;
 import net.coderbot.iris.gl.blending.AlphaTestFunction;
 import net.coderbot.iris.gl.shader.StandardMacros;
 import net.coderbot.iris.pipeline.WorldRenderingPipeline;
 import net.coderbot.iris.pipeline.newshader.NewWorldRenderingPipeline;
-import net.coderbot.iris.shaderpack.*;
+import net.coderbot.iris.shaderpack.ProgramFallbackResolver;
+import net.coderbot.iris.shaderpack.ProgramSet;
+import net.coderbot.iris.shaderpack.ProgramSource;
+import net.coderbot.iris.shaderpack.StringPair;
 import net.coderbot.iris.shaderpack.loading.ProgramId;
 import net.coderbot.iris.shaderpack.preprocessor.JcppProcessor;
 import top.leonx.irisflw.accessors.NewWorldRenderingPipelineAccessor;
 import top.leonx.irisflw.accessors.ProgramDirectivesAccessor;
 import top.leonx.irisflw.transformer.ShaderPatcherBase;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 public class NewProgramCompiler <TP extends ShaderPatcherBase,P extends WorldProgram> extends IrisProgramCompilerBase<P>{
     private final Map<ProgramSet,ProgramFallbackResolver> resolvers = new HashMap<>();
     private final Iterable<StringPair> environmentDefines;
     public NewProgramCompiler(GlProgram.Factory<P> factory, Template<? extends VertexData> template, FileResolution header,Class<TP> patcherClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         super(factory, template, header);
-        environmentDefines = StandardMacros.createStandardEnvironmentDefines();
+        environmentDefines = (Iterable<StringPair>) StandardMacros.createStandardEnvironmentDefines();
         patcher = patcherClass.getDeclaredConstructor(Template.class, FileResolution.class).newInstance(template,header);
     }
 
